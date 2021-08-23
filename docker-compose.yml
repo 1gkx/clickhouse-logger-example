@@ -1,0 +1,53 @@
+version: "3"
+
+services:
+
+  application:
+    container_name: test_app
+    image: golang:1.16-alpine
+    volumes:
+      - "./app/:/usr/app/"
+      - "./app/logs:/logs"
+    command: >
+      /bin/sh -c "cd /usr/app && go mod download && go run main.go"
+
+  vector:
+    container_name: vector
+    image: timberio/vector:0.8.2-alpine
+
+#  logstash:
+#    container_name: logstash
+#    image: docker.elastic.co/logstash/logstash-oss:7.14.0
+#    volumes:
+#      - "./logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro"
+#      - "./logstash/config/pipelines:/usr/share/logstash/config/pipelines:ro"
+#    command: >
+#      bash -c "bin/logstash-plugin install logstash-output-clickhouse \
+#        && logstash -f /etc/logstash/conf.d/logstash.conf"
+#    ports:
+#      - "5046:5046"
+
+#  filebeat:
+#    image: docker.elastic.co/beats/filebeat-oss:7.14.0
+#    entrypoint: filebeat -e -strict.perms=false
+#    user: root
+#    depends_on:
+#      - application
+#      - logstash
+#    volumes:
+#      - "./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+#      - "./app/logs:/var/app/log"
+
+  clickhouse:
+    image: yandex/clickhouse-server:21.3-alpine
+    volumes:
+      - "./clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql:ro"
+      - "./clickhouse/data/:/var/lib/clickhouse/"
+      - "./clickhouse/log/:/var/log/clickhouse-server/"
+    ports:
+      - "8123:8123"
+
+  tabix:
+    image: spoonest/clickhouse-tabix-web-client
+    ports:
+      - "8089:80"

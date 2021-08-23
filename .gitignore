@@ -1,0 +1,4 @@
+.idea/
+clickhouse/data
+clickhouse/log
+app/logs

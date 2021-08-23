@@ -1,0 +1,15 @@
+filebeat.inputs:
+  - type: log
+    # Определяем путь к лог-файлам
+    paths:
+      - /var/app/log/*.log
+    processors:
+      - drop_fields:
+          fields: [ "@metadata", "agent", "container", "ecs", "log", "input", "docker", "host" ]
+          ignore_missing: true
+
+# Пока будем выводить лог-сообщения в консоль
+#output.console:
+#  pretty: true
+output.logstash:
+  hosts: ["logstash:5046"]
