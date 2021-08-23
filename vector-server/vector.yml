@@ -1,0 +1,20 @@
+data_dir = "/var/lib/vector"
+
+[sources.app_input_vector]
+  type = "vector"
+  address = "0.0.0.0:9876"
+  shutdown_timeout_secs = 30
+
+[sinks.clickhouse]
+  inputs = ["app_input_vector"] # Берем из sources
+  type = "clickhouse"
+  database = "Test"
+  host = "clickhouse:8123" #  Адрес Clickhouse
+  table = "test"
+  encoding.timestamp_format = "unix"
+  healthcheck = true
+
+#
+# [sinks.console]
+#   type = "console"
+#   inputs = ["app_input_vector"]

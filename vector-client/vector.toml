@@ -1,0 +1,17 @@
+data_dir = "/var/lib/vector"
+
+[sources.app]
+ type                          = "file"
+ include                       = [ "/var/app/logs/logrus.log" ]
+ start_at_beginning            = false
+
+[sinks.app_output_vector]
+  type                          = "vector"
+  inputs                        = [ "app" ]
+  address                       = "vector-server:9876"
+
+[sinks.console]
+  type = "console"
+  inputs = ["app_input_vector"]
+  encoding.codec = "json"
+  encoding.timestamp_format = "unix"

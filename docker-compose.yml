@@ -7,13 +7,30 @@ services:
     image: golang:1.16-alpine
     volumes:
       - "./app/:/usr/app/"
-      - "./app/logs:/logs"
     command: >
       /bin/sh -c "cd /usr/app && go mod download && go run main.go"
 
-  vector:
-    container_name: vector
+#  vector-client:
+#    container_name: vector-client
+#    image: timberio/vector:0.8.2-alpine
+#    environment:
+#      RUST_BACKTRACE: full
+#    depends_on:
+##      - vector-server
+#      - application
+#    volumes:
+#      - "./app/logs/:/usr/app/"
+#      - "./vector-client/vector.toml:/etc/vector/vector.toml"
+#    command: ["--config", "/etc/vector/vector.toml", "-w"]
+
+  vector-server:
+    container_name: vector-server
     image: timberio/vector:0.8.2-alpine
+    depends_on:
+      - application
+#      - clickhouse
+    volumes:
+      - "./vector-server/vector.toml:/etc/vector/vector.toml"
 
 #  logstash:
 #    container_name: logstash
@@ -38,16 +55,18 @@ services:
 #      - "./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
 #      - "./app/logs:/var/app/log"
 
-  clickhouse:
-    image: yandex/clickhouse-server:21.3-alpine
-    volumes:
-      - "./clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql:ro"
-      - "./clickhouse/data/:/var/lib/clickhouse/"
-      - "./clickhouse/log/:/var/log/clickhouse-server/"
-    ports:
-      - "8123:8123"
+#  clickhouse:
+#    image: yandex/clickhouse-server:21.3-alpine
+#    volumes:
+#      - "./clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql:ro"
+#      - "./clickhouse/data/:/var/lib/clickhouse/"
+#      - "./clickhouse/log/:/var/log/clickhouse-server/"
+#    ports:
+#      - "8123:8123"
 
-  tabix:
-    image: spoonest/clickhouse-tabix-web-client
-    ports:
-      - "8089:80"
+#  tabix:
+#    image: spoonest/clickhouse-tabix-web-client
+#    depends_on:
+#      - clickhouse
+#    ports:
+#      - "8089:80"
