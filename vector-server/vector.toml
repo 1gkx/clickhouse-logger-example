@@ -1,15 +1,20 @@
 data_dir = "/var/lib/vector"
 
 [sources.app_input_vector]
-  type = "vector"
-  address = "0.0.0.0:9876"
-  shutdown_timeout_secs = 30
+ type = "file"
+ include = [ "/var/app/logs/logrus.log" ]
+ start_at_beginning = false
+
+# [sources.app_input_vector]
+#   type = "vector"
+#   address = "0.0.0.0:9876"
+#   shutdown_timeout_secs = 30
 
 [sinks.clickhouse]
   inputs = ["app_input_vector"] # Берем из sources
   type = "clickhouse"
   database = "Test"
-  host = "clickhouse:8123" #  Адрес Clickhouse
+  host = "http://192.168.112.3:8123" #  Адрес Clickhouse
   table = "test"
   encoding.timestamp_format = "unix"
   healthcheck = true

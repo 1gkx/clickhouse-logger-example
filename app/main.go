@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -17,7 +16,9 @@ func main() {
 		fmt.Printf("error opening file: %v\n", err)
 	}
 
-	log.SetOutput(io.MultiWriter(os.Stderr, logFile))
+	log.SetFormatter(&log.JSONFormatter{})
+	//log.SetOutput(io.MultiWriter(os.Stderr, logFile))
+	log.SetOutput(logFile)
 
 	for i := 1; i <= 10 ; i++ {
 		log.WithFields(log.Fields{

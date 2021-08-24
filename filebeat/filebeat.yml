@@ -1,15 +1,31 @@
+#logging.level: warning
+logging.metrics.enabled: false
+
 filebeat.inputs:
   - type: log
+    enabled: true
+    encoding: "utf-8"
+    tail_files: true
+    scan_frequency: 3
     # Определяем путь к лог-файлам
     paths:
-      - /var/app/log/*.log
+      - /var/app/log/*
     processors:
       - drop_fields:
           fields: [ "@metadata", "agent", "container", "ecs", "log", "input", "docker", "host" ]
           ignore_missing: true
+      - drop_event:
+          when:
+            equals:
+              http.code: 200
 
 # Пока будем выводить лог-сообщения в консоль
 #output.console:
 #  pretty: true
-output.logstash:
-  hosts: ["logstash:5046"]
+
+output:
+  logstash:
+    hosts: ["logstash:5044"]
+    max_retries: 5
+    timeout: 120
+    backoff.init: 15
